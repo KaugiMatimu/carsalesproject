@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\products;
+use PDF;
+use Notification;
+use App\Notifications\sendMail;
 
 class AdminController extends Controller
 {
@@ -91,6 +94,41 @@ class AdminController extends Controller
 
     public function order(){
         $order = order::all();
+        return view('admin.order', compact('order'));
+    }
+
+    public function delivered($id){
+        $order = order::find($id);
+        $order ->delivery_status ='Delivered';
+        $order ->payment_status ='Paid';
+        $order->save();
+        return redirect()->back();
+    }
+    public function print_order($id){
+        $order = Order::find($id); // Make sure 'Order' is capitalized if it's your model
+        $pdf = PDF::loadView('admin.print_order', compact('order'));
+        return $pdf->download('order_details.pdf');
+    }
+    public function send_email($id){
+        $order = order::find($id);
+        return view('admin.send_email', compact('order'));
+    }
+    public function send_user_email(Request $request, $id){
+        $order = order::find($id);
+        $details =[
+            'greeting' => $request -> greeting,
+            'subject' => $request -> subject,
+            'button' => $request -> button,
+            'url' => $request -> url,
+            'message' => $request -> message,
+
+        ];
+        Notification::send($order, new SendMail($details));
+        return redirect()->back();
+    }
+    public function search_order(Request $request){
+        $searchText = $request->search;
+        $order = order::where('name', 'LIKE', "%{$searchText}%")->orWhere('product_title', 'LIKE', "%{$searchText}%")->get();
         return view('admin.order', compact('order'));
     }
 }

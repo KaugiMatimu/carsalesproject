@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Products;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\Comments;
+use App\Models\Reply;
 use Session;
 use Stripe;
 use Illuminate\Support\Facades\Auth;
@@ -16,16 +18,34 @@ class HomeController extends Controller
     
     public function index(){
         $products = Products::paginate(9);
-        return view('home.userpage', compact('products'));
+        $comments = comments::orderby('id','desc')->get(); 
+        $reply = reply::all();
+        return view('home.userpage', compact('products', 'comments', 'reply'));
     }
 
     public function redirect(){
         $usertype=Auth::user() ->usertype;
         if($usertype == '1'){
-            return view('admin.home');
+
+            $total_products = products::all()->count();
+            $total_order = order::all()->count();
+            $total_user = user::all()->count();
+            $order = order::all();
+
+
+            $total_revenue = 0;
+            foreach ($order as $order){
+                $total_revenue = $total_revenue + $order->price;
+            }
+            $total_delivery = order::where('delivery_status', '=', 'Delivered')->get()->count();
+
+            $total_processing = order::where('delivery_status', '=', 'processing')->get()->count();
+            return view('admin.home', compact('total_products', 'total_order', 'total_user', 'total_revenue', 'total_delivery', 'total_processing'));
         }else{
-            $products = Products::paginate(9); 
-            return view('home.userpage', compact('products'));
+            $products = Products::paginate(9);
+            $comments = comments::orderby('id','desc')->get(); 
+            $reply = reply::all();
+            return view('home.userpage', compact('products', 'comments', 'reply'));
         }
     }
     public function product_details($id){
@@ -148,5 +168,54 @@ class HomeController extends Controller
         Session::flash('success', 'Payment successful!');
               
         return back();
+    }
+    public function show_order(){
+        if(Auth::id()){
+
+            $user = Auth::user();
+            $userid = $user->id;
+            $order =order::where('user_id', '=', $userid)->get();
+            return view('home.order', compact('order'));
+        }else{
+            return redirect('login');
+        }
+    }
+
+    public function cancel_order($id){
+        $order = order::find($id);
+        $order ->delivery_status = "Canceled";
+        $order->save();
+        return redirect()->back();
+    }
+    public function add_comment(Request $request){
+        // Check if user is logged in
+        if(Auth::id()){
+            $comments = new Comments;
+            $comments->name = Auth::user()->name;
+            $comments->user_id = Auth::user()->id;
+            $comments->comment = $request->comment;
+            $comments->save();
+
+            return redirect()->back();
+        } else {
+            return redirect('login');
+        }
+    }
+    public function add_reply(Request $request){
+        if(Auth::id()){
+            // Debugging to ensure comment_id is being received
+            // dd($request->all());
+
+            $reply = new Reply;
+            $reply->name = Auth::user()->name;
+            $reply->user_id = Auth::user()->id;
+            $reply->comment_id = $request->comment_id; // Ensure this matches the form field name
+            $reply->reply = $request->reply;
+            $reply->save();
+
+            return redirect()->back();
+        } else {
+            return redirect('login');
+        }
     }
 }

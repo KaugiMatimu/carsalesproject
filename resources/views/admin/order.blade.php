@@ -26,6 +26,14 @@
             text-align: center;
             padding-top: 40px;
         }
+        .search-form {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .search-form input {
+            width: 300px;
+        }
     </style>
   </head>
   <body>
@@ -41,6 +49,17 @@
          <div class="h2_class">
                 <h2>All Orders</h2>
             </div>
+            <div class="search-form">
+                <form action="{{url('search_order')}}" method="GET">
+                  @csrf
+                    <div class="input-group">
+                        <input type="text" name="search" class="form-control" placeholder="Search orders...">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
           <table class="table table-hover">
             <thead>
                 <tr>
@@ -54,6 +73,9 @@
                 <th scope="col">Payment Status</th>
                 <th scope="col">Delivery Status</th>
                 <th scope="col">Image</th>
+                <th scope="col">Delivered</th>
+                <th scope="col">Print</th>
+                <th scope="col">Send Email</th>
                 </tr>
             </thead>
             <tbody>
@@ -69,6 +91,17 @@
                 <td>{{$order->payment_status}}</td>
                 <td>{{$order->delivery_status}}</td>
                 <td><img src="/product/{{$order->image}}" style="width: 100px; height: auto; border-radius: 8px;" alt=""></td>
+                <td>
+
+                @if($order->delivery_status =='processing')
+                    <a href="{{url('delivered', $order->id)}}" onclick="return confirm('Are You Sure This Order is Delivered ??')" 
+                    class="btn btn-primary">Delivered
+                @else
+                <p style="color:red;">Delivered</p>
+                @endif
+                </td>
+                <td><a href="{{url('print_order', $order->id)}}"class="btn btn-secondary">Print</td>
+                <td><a href="{{url('send_email', $order->id)}}" class="btn btn-info">Send Email</a></td>
                 </tr>
                 @endforeach
             </tbody>
