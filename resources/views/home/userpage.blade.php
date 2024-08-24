@@ -20,6 +20,8 @@
       <link href="home/css/style.css" rel="stylesheet" />
       <!-- responsive style -->
       <link href="home/css/responsive.css" rel="stylesheet" />
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
 
       <style>
 .slider_section {
@@ -78,27 +80,113 @@
         padding: 10px 25px;
     }
 }
+/* Comment Box Styling */
 .comment-box {
-            margin-top: 20px;
-        }
-        .comment {
-            padding: 15px;
-            margin-top: 10px;
-            background-color: #f9f9f9;
-            border-radius: 5px;
-        }
-        .reply-button {
-            color: #007bff;
-            cursor: pointer;
-        }
-        .reply-box {
-            margin-left: 50px;
-            margin-top: 10px;
-        }
+    margin-top: 20px;
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
 
-    </style>
+.comment-box textarea {
+    width: 100%;
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.comment-box .btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.comment-box .btn:hover {
+    background-color: #0056b3;
+}
+
+/* Individual Comment Styling */
+.comment {
+    padding: 15px;
+    margin-top: 15px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.comment b {
+    font-size: 18px;
+    color: #333;
+}
+
+.comment p {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.reply-button {
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Reply Box Styling */
+.reply-box {
+    margin-left: 50px;
+    margin-top: 10px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.reply-box textarea {
+    width: 100%;
+    border-radius: 5px;
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+.reply-box .btn {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    border: none;
+    margin-top: 5px;
+}
+
+.reply-box .btn:hover {
+    background-color: #0056b3;
+}
+
+.close-reply {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.close-reply:hover {
+    color: #333;
+}
+</style>
 </head>
 <body>
+
+
+@include('sweetalert::alert')
     <div class="hero_area">
         @include('home.header')
         @include('home.slider')
@@ -112,39 +200,39 @@
       
       <!-- product section -->
        @include('home.products')
-    
-    <div class="container">
-        <form action="{{url('add_comment')}}" method="post">
-            @csrf
-            <!-- Comment Textbox -->
-            <h2 style="text-align: center;">All Comments</h2>
-            <div class="comment-box">
-                <textarea class="form-control" rows="3" name="comment" placeholder="Write your comment here..."></textarea>
-                <input type="submit" class="btn btn-primary mt-2" value="Comment">
-            </div>
+       <div class="container">
+    <form action="{{url('add_comment')}}" method="post">
+        @csrf
+        <!-- Comment Textbox -->
+        <h2 style="text-align: center;">All Comments</h2>
+        <div class="comment-box">
+            <textarea class="form-control" rows="3" name="comment" placeholder="Write your comment here..."></textarea>
+            <input type="submit" class="btn btn-primary mt-2" value="Comment">
+        </div>
 
-            <!-- Existing Comments -->
-            @foreach($comments as $comment)
-            <div class="comment">
-                <input type="hidden" class="commentId" value="{{$comment->id}}">
-                <b>{{$comment->name}}</b>
-                <p>{{$comment->comment}}</p>
+        <!-- Existing Comments -->
+        @foreach($comments as $comment)
+        <div class="comment">
+            <input type="hidden" class="commentId" value="{{$comment->id}}">
+            <b>{{$comment->name}}</b>
+            <p>{{$comment->comment}}</p>
+            <span class="reply-button">Reply</span>
+
+            <!-- Existing Replies -->
+            @foreach($reply as $rep)
+            @if($rep->comment_id == $comment->id)
+            <div class="reply-box">
+                <b>{{$rep->name}}</b>
+                <p>{{$rep->reply}}</p>
                 <span class="reply-button">Reply</span>
-
-                <!-- Existing Replies -->
-                @foreach($reply as $rep)
-                @if($rep ->comment_id == $comment ->id)
-                <div class="reply-box">
-                    <b>{{$rep->name}}</b>
-                    <p>{{$rep->reply}}</p>
-                    <span class="reply-button">Reply</span>
-                </div>
-                @endif
-                @endforeach
             </div>
+            @endif
             @endforeach
-        </form>
-    </div>
+        </div>
+        @endforeach
+    </form>
+</div>
+
     @include('home.subscribe')
       <!-- end subscribe section -->
       <!-- client section -->
@@ -173,24 +261,32 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
         $(document).ready(function () {
-            $('.reply-button').click(function () {
-                let replyBox = $(this).siblings('.reply-box');
-                let commentId = $(this).closest('.comment').find('.commentId').val();
+    $('.reply-button').click(function () {
+        let replyBox = $(this).siblings('.reply-box');
+        let commentId = $(this).closest('.comment').find('.commentId').val();
 
-                if (replyBox.children().length === 0) {
-                    replyBox.append(`
-                    <form action="{{url('add_reply')}}" method="POST">
-                    @csrf
-                        <input type="hidden" name="comment_id" value="${commentId}">
-                        <textarea class="form-control" rows="2" name="reply" placeholder="Write your reply here..."></textarea>
-                        <input type="submit" class="btn btn-secondary mt-2" value="Reply">
-                    </form>
-                    `);
-                } else {
-                    replyBox.empty();
-                }
+        if (replyBox.children('form').length === 0) { // Check if the form already exists
+            replyBox.html(`
+            <form action="{{url('add_reply')}}" method="POST">
+            @csrf
+                <input type="hidden" name="comment_id" value="${commentId}">
+                <textarea class="form-control" rows="2" name="reply" placeholder="Write your reply here..."></textarea>
+                <input type="submit" class="btn btn-secondary mt-2" value="Reply">
+                <span class="close-reply">&times;</span>
+            </form>
+            `);
+
+            // Attach close event handler
+            replyBox.find('.close-reply').click(function() {
+                replyBox.empty(); // Clear the reply box when closed
             });
-        });
+        } else {
+            replyBox.empty(); // If the form is already present, remove it (toggle behavior)
+        }
+    });
+});
+
+
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function(event) { 

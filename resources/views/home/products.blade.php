@@ -3,6 +3,12 @@
 <section class="product_section layout_padding">
          <div class="container">
             <div class="heading_container heading_center">
+            @if(session()->has('message'))
+            <div class="alert alert-success">
+               <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+               {{ session()->get('message') }}
+            </div>
+         @endif
                <h2>
                   Our <span>products</span>
                </h2>

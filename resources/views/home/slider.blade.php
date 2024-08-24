@@ -1,6 +1,6 @@
 <section class="slider_section ">
             <div class="slider_bg_box">
-               <img src="images/mikebirdy.jpg" alt="">
+               <img src="images/car3.jpg" alt="">
             </div>
             <div id="customCarousel1" class="carousel slide" data-ride="carousel">
                <div class="carousel-inner">
@@ -9,15 +9,17 @@
                         <div class="row">
                            <div class="col-md-7 col-lg-6 ">
                               <div class="detail-box">
-                                 <h1>
+                                 <h4>
                                     <span>
-                                    Sale 20% Off
+                                    Fuel Your Passion, Drive with Precision
                                     </span>
                                     <br>
-                                    On Everything
-                                 </h1>
+                                     Your Ultimate Racing Parts Hub!
+                                 </h4>
                                  <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
+                                 Unleash the full potential of your racing machine with our premium selection of racing car parts. 
+                                 Whether you're upgrading for peak performance or seeking reliable replacements, we offer top-quality components that ensure
+                                  your ride stays ahead of the competition. From engines to exhausts, trust us to keep your passion on track.
                                  </p>
                                  <div class="btn-box">
                                     <a href="" class="btn1">
@@ -42,7 +44,10 @@
                                     On Everything
                                  </h1>
                                  <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
+                                 At our racing car parts store, we understand the thrill of speed and the importance of precision. 
+                                 That's why we stock only the best in performance parts, designed to give you the edge on the track. 
+                                 Whether you're a professional racer or an enthusiast, 
+                                 our expertly curated selection will help you fine-tune your vehicle for optimal performance, reliability, and safety.
                                  </p>
                                  <div class="btn-box">
                                     <a href="" class="btn1">
@@ -67,7 +72,9 @@
                                     On Everything
                                  </h1>
                                  <p>
-                                    Explicabo esse amet tempora quibusdam laudantium, laborum eaque magnam fugiat hic? Esse dicta aliquid error repudiandae earum suscipit fugiat molestias, veniam, vel architecto veritatis delectus repellat modi impedit sequi.
+                                 Experience the difference with our cutting-edge racing car parts, crafted for those who demand excellence. 
+                                 From high-performance brakes to aerodynamic enhancements, we provide the tools you need 
+                                 to dominate every race. With a commitment to quality and innovation, we're here to support your journey to the finish line.
                                  </p>
                                  <div class="btn-box">
                                     <a href="" class="btn1">

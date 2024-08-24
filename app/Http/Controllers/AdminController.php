@@ -10,12 +10,18 @@ use App\Models\products;
 use PDF;
 use Notification;
 use App\Notifications\sendMail;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
     public function view_category(){
-        $data = category::all();
-        return view('admin.category', compact('data'));
+        if(Auth::id()){
+            $data = category::all();
+            return view('admin.category', compact('data'));
+        }else{
+            return redirect('login');
+        }
+        
     }
 
     public function add_category(Request $request){
@@ -34,8 +40,13 @@ class AdminController extends Controller
     }
 
     public function view_products(){
-        $categories = Category::all();
-        return view('admin.products', compact('categories'));
+        if(Auth::id()){
+            $categories = Category::all();
+            return view('admin.products', compact('categories'));
+        }else{
+            return redirect('login');
+        }
+        
     }
 
     public function add_products(Request $request){
