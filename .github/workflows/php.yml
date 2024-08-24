@@ -1,0 +1,200 @@
+name: PHP Composer
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Validate composer.json and composer.lock
+      run: composer validate --strict
+
+    - name: Cache Composer packages
+      id: composer-cache
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
+    # Docs: https://getcomposer.org/doc/articles/scripts.md
+
+    # - name: Run test suite
+    #   run: composer run-script test
+    
+            - name: Deploy Amazon Aurora DB cluster (Postgres/MySQL)
+  # You may pin to the exact commit or the version.
+  # uses: bitovi/github-actions-deploy-aurora@875f0710fc500d8cd2870feaf7960e127e6afd79
+  uses: bitovi/github-actions-deploy-aurora@v0.1.1
+  with:
+    # Will run only the generation phase of BitOps, where the Terraform and Ansible code is built.
+    bitops_code_only: # optional
+    # Store BitOps code as a GitHub artifact
+    bitops_code_store: # optional
+    # AWS access key ID
+    aws_access_key_id: 
+    # AWS secret access key
+    aws_secret_access_key: 
+    # AWS session token
+    aws_session_token: # optional
+    # AWS default region
+    aws_default_region: # optional, default is us-east-1
+    # Set to override the AWS resource identifier for the deployment.  Defaults to `${org}-{repo}-{branch}`.  Use with destroy to destroy specific resources.
+    aws_resource_identifier: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_additional_tags: # optional
+    # Set to "true" to Destroy the stack through Terraform.
+    tf_stack_destroy: # optional
+    # Change this to be anything you want to. Carefull to be consistent here. A missing file could trigger recreation, or stepping over destruction of non-defined objects.
+    tf_state_file_name: # optional
+    # Append a string to the tf-state-file. Setting this to `unique` will generate `tf-state-aws-unique`. Can co-exist with the tf_state_file_name variable. 
+    tf_state_file_name_append: # optional
+    # AWS S3 bucket to use for Terraform state. Defaults to `${org}-${repo}-{branch}-tf-state`
+    tf_state_bucket: # optional
+    # Force purge and deletion of S3 bucket defined. Any file contained there will be destroyed. `tf_stack_destroy` must also be `true`
+    tf_state_bucket_destroy: # optional
+    # Toggles deployment of an Aurora database. Defaults to true.
+    aws_aurora_enable: # optional, default is true
+    # Aurora DB Proxy Toggle. Defaults to false.
+    aws_aurora_proxy: # optional
+    # The name of the cluster. Will be created if it does not exist. Defaults to aws_resource_identifier if none set.
+    aws_aurora_cluster_name: # optional
+    # The database engine to use. Defaults to aurora-postgresql.
+    aws_aurora_engine: # optional
+    # The DB version of the engine to use.
+    aws_aurora_engine_version: # optional
+    # Database engine mode. Could be global, multimaster, parallelquey, provisioned, serverless.
+    aws_aurora_engine_mode: # optional
+    # List of availability zones for the DB cluster storage where DB cluster instances can be created.
+    aws_aurora_availability_zones: # optional
+    # Apply changes immediately to the cluster. If not, will be done in next maintenance window.. Default false
+    aws_aurora_cluster_apply_immediately: # optional
+    # Amount of storage in gigabytes. Required for multi-az cluster.
+    aws_aurora_allocated_storage: # optional
+    # Toggles whether the DB cluster is encrypted. Defaults to true.
+    aws_aurora_storage_encrypted: # optional
+    # KMS Key ID to use with the cluster encrypted storage.
+    aws_aurora_kms_key_id: # optional
+    # Define type of storage to use. Required for multi-az cluster.
+    aws_aurora_storage_type: # optional
+    # iops for storage. Required for multi-az cluster. 
+    aws_aurora_storage_iops: # optional
+    # The name of the database. will be created if it does not exist. Defaults to aurora
+    aws_aurora_database_name: # optional
+    # Master username. Defaults to aurora
+    aws_aurora_master_username: # optional
+    # The family of the DB parameter group. See https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AuroraMySQL.Reference.html https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/AuroraPostgreSQL.Reference.html. Defaults set for Postges and MySQL.
+    aws_aurora_database_group_family: # optional
+    # Toggles IAM Authentication. Defaults to false.
+    aws_aurora_iam_auth_enabled: # optional
+    # Define the ARN list of allowed roles.
+    aws_aurora_iam_roles: # optional
+    # To create a Multi-AZ RDS cluster, you must additionally specify the engine, storage_type, allocated_storage, iops and aws_aurora_db_cluster_instance_class attributes.
+    aws_aurora_cluster_db_instance_class: # optional
+    # Name of the security group to use for postgres. Defaults to SG for ${var.aws_resource_identifier} - Aurora
+    aws_aurora_security_group_name: # optional
+    # Allow access from 0.0.0.0/0 in the same VPC. Defaults to true
+    aws_aurora_ingress_allow_all: # optional
+    # Extra names of the security groups to access Aurora.
+    aws_aurora_allowed_security_groups: # optional
+    # The list of subnet ids to use for postgres.
+    aws_aurora_subnets: # optional
+    # Database port. Defaults to 5432
+    aws_aurora_database_port: # optional
+    # Make database publicly accessible. Defaults to false.
+    aws_aurora_db_publicly_accessible: # optional
+    # Toggles cloudwatch. Defaults to true
+    aws_aurora_cloudwatch_enable: # optional
+    # Comma separated list of log types to include in cloudwatch. If none defined, will use [postgresql] or [audit,error,general,slowquery]. Based on the db engine.
+    aws_aurora_cloudwatch_log_type: # optional
+    # Days to store cloudwatch logs. Defaults to 7.
+    aws_aurora_cloudwatch_retention_days: # optional
+    # Target backtrack window, in seconds. Only available for aurora and aurora-mysql engines currently. 0 to disable. Defaults to 0
+    aws_aurora_backtrack_window: # optional
+    # Days to retain backups for. Defaults to 5.
+    aws_aurora_backup_retention_period: # optional
+    # Daily time range during which the backups happen.
+    aws_aurora_backup_window: # optional
+    # Maintenance window.
+    aws_aurora_maintenance_window: # optional
+    # Set the name to Generate a snapshot of the database before deletion.
+    aws_aurora_database_final_snapshot: # optional
+    # Protects the database from deletion. Defaults to false. This wont prevent Terraform from destroying it.
+    aws_aurora_deletion_protection: # optional
+    # Specifies whether to remove automated backups immediately after the DB cluster is deleted. Default is true.
+    aws_aurora_delete_auto_backups: # optional
+    # Restore an initial snapshot of the DB if specified.
+    aws_aurora_restore_snapshot_id: # optional
+    # Restore database to a point in time. Will require a map of strings. Like {"restore_to_time"="W","restore_type"="X","source_cluster_identifier"="Y", "use_latest_restorable_time"="Z"}. Default {}
+    aws_aurora_restore_to_point_in_time: # optional
+    # Takes a snapshot of the DB.
+    aws_aurora_snapshot_name: # optional
+    # Overwrites snapshot if same name is set. Defaults to false.
+    aws_aurora_snapshot_overwrite: # optional
+    # Amount of instances to create. Defaults to 1.
+    aws_aurora_db_instances_count: # optional
+    # Database instance size. Defaults to db.r6g.large.
+    aws_aurora_db_instance_class: # optional
+    # Specifies whether any modifications are applied immediately, or during the next maintenance window. Defaults to false.
+    aws_aurora_db_apply_immediately: # optional
+    # Certificate to use with the database. Defaults to rds-ca-ecc384-g1.
+    aws_aurora_db_ca_cert_identifier: # optional
+    # Maintenance window.
+    aws_aurora_db_maintenance_window: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_aurora_additional_tags: # optional
+    # DB Proxy name
+    aws_db_proxy_name: # optional
+    # Auth type to use, will use the following, depending on DB the family. MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, and SQL_SERVER_AUTHENTICATION
+    aws_db_proxy_client_password_auth_type: # optional
+    # Toogle TLS enforcement for connection
+    aws_db_proxy_tls: # optional
+    # Name for the proxy security group. Default to aws_resource_identifier if none.
+    aws_db_proxy_security_group_name: # optional
+    # Will add an incoming rule from every security group associated with the DB
+    aws_db_proxy_database_security_group_allow: # optional
+    # Comma separated list of SG Ids to add.
+    aws_db_proxy_allowed_security_group: # optional
+    # Allow all incoming traffic to the DB Proxy. Mind that the proxy is only available from the internal network except manually exposed.
+    aws_db_proxy_allow_all_incoming: # optional
+    # Toggle Cloudwatch logs. Will be stored in /aws/rds/proxy/rds_proxy.name
+    aws_db_proxy_cloudwatch_enable: # optional
+    # Number of days to retain logs
+    aws_db_proxy_cloudwatch_retention_days: # optional
+    # A list of strings that will be added to created resources
+    aws_db_proxy_additional_tags: # optional
+    # Define if a VPC should be created
+    aws_vpc_create: # optional
+    # Set a specific name for the VPC
+    aws_vpc_name: # optional
+    # Define Base CIDR block which is divided into subnet CIDR blocks. Defaults to 10.0.0.0/16.
+    aws_vpc_cidr_block: # optional
+    # Comma separated list of public subnets. Defaults to 10.10.110.0/24
+    aws_vpc_public_subnets: # optional
+    # Comma separated list of private subnets. If none, none will be created.
+    aws_vpc_private_subnets: # optional
+    # Comma separated list of availability zones. Defaults to `aws_default_region.
+    aws_vpc_availability_zones: # optional
+    # AWS VPC ID. Accepts `vpc-###` values.
+    aws_vpc_id: # optional
+    # Specify a Subnet to be used with the instance. If none provided, will pick one.
+    aws_vpc_subnet_id: # optional
+    # A JSON object of additional tags that will be included on created resources. Example: `{"key1": "value1", "key2": "value2"}`
+    aws_vpc_additional_tags: # optional
+          
